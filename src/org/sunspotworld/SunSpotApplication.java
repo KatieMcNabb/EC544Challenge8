@@ -4,10 +4,13 @@ import com.sun.spot.io.j2me.radiogram.*;
 import com.sun.spot.peripheral.radio.RadioFactory;
 import com.sun.spot.resources.Resources;
 import com.sun.spot.resources.transducers.IAnalogInput;
+import com.sun.spot.resources.transducers.ISwitchListener;
 import com.sun.spot.resources.transducers.ITriColorLED;
 import com.sun.spot.resources.transducers.ITriColorLEDArray;
+import com.sun.spot.resources.transducers.SwitchEvent;
 import com.sun.spot.sensorboard.EDemoBoard;
 import com.sun.spot.sensorboard.peripheral.IServo;
+import com.sun.spot.sensorboard.peripheral.ISwitch;
 import com.sun.spot.sensorboard.peripheral.Servo;
 import com.sun.spot.service.BootloaderListenerService;
 import com.sun.spot.util.IEEEAddress;
@@ -23,9 +26,10 @@ import javax.microedition.midlet.MIDletStateChangeException;
  * The startApp method of this class is called by the VM to start the
  * application.
  */
-public class SunSpotApplication extends MIDlet {
+public class SunSpotApplication extends MIDlet implements ISwitchListener {
      // devices
     private EDemoBoard eDemo = EDemoBoard.getInstance();
+    private ISwitch sw2 = (ISwitch)Resources.lookup(ISwitch.class, "SW2"); 
     // left servo from driver's view
     private IServo servo1 = new Servo(eDemo.getOutputPins()[EDemoBoard.H1]);
     // right servo from driver's view
@@ -49,21 +53,19 @@ public class SunSpotApplication extends MIDlet {
     private int current2 = SERVO_CENTER_VALUE;
     private int step2 = SERVO2_LOW;
     private ITriColorLEDArray leds = (ITriColorLEDArray) Resources.lookup(ITriColorLEDArray.class);
+    private Datagram dg = null;
+    private RadiogramConnection rCon = null;
+    private IAnalogInput rightCarSensor = EDemoBoard.getInstance().getAnalogInputs()[EDemoBoard.A0];
+    private IAnalogInput leftCarSensor = EDemoBoard.getInstance().getAnalogInputs()[EDemoBoard.A1];
     
     protected void startApp() throws MIDletStateChangeException {
-        servo1.setValue(SERVO_CENTER_VALUE-205);
-        servo2.setValue(1450);
-        RadiogramConnection rCon = null;
-        Datagram dg = null;
+    //    
+      //  servo2.setValue(1450);
+
         BootloaderListenerService.getInstance().start();   // monitor the USB (if connected) and recognize commands from host
 
         long ourAddr = RadioFactory.getRadioPolicyManager().getIEEEAddress();
         System.out.println("Our radio address = " + IEEEAddress.toDottedHex(ourAddr));
-
-        IAnalogInput rightCarSensor = EDemoBoard.getInstance().getAnalogInputs()[EDemoBoard.A0];
-        IAnalogInput leftCarSensor = EDemoBoard.getInstance().getAnalogInputs()[EDemoBoard.A1];
-        ITriColorLED led = leds.getLED(0);
-        led.setRGB(100,0,0);   // set color to moderate red
         //start_wheels
         try {
             // Open up a broadcast connection to the host port
@@ -74,27 +76,13 @@ public class SunSpotApplication extends MIDlet {
             System.err.println("Caught " + e + " in connection initialization.");
             notifyDestroyed();
         }
+        System.out.println("setting calibration values");
+        servo1.setValue(1500);
+        servo2.setValue(1500);
+        sw2.addISwitchListener(this);
+        
 
-   while(true){
-       try {
-           
-           dg.reset();
-                double inchesCarRight = -1*(rightCarSensor.getVoltage()/scaleFactor);
-                double inchesCarLeft = (leftCarSensor.getVoltage())/scaleFactor;
-                dg.writeDouble(inchesCarLeft);
-                dg.writeDouble(inchesCarRight);
-                rCon.send(dg);
-                
-        servo2.setValue(1450);
-      
-                
-    System.out.println("forward");
-                
-               // Utils.sleep(50);
-            } catch (IOException ex){
-                ex.printStackTrace();
-            }
-        }
+
    
      }
 
@@ -122,5 +110,34 @@ public class SunSpotApplication extends MIDlet {
         } else {
             servo1.setValue(SERVO1_MIN_VALUE);
         }
+    }
+
+
+    public void switchPressed(SwitchEvent se) {
+        
+         System.out.println("switch pressed");
+         while(true){
+            try {
+           dg.reset();
+                double inchesCarRight = -1*(rightCarSensor.getVoltage()/scaleFactor);
+                double inchesCarLeft = (leftCarSensor.getVoltage())/scaleFactor;
+                dg.writeDouble(inchesCarLeft);
+                dg.writeDouble(inchesCarRight);
+                rCon.send(dg);
+                
+        servo2.setValue(1450);
+      
+                
+    System.out.println("forward");
+                
+               // Utils.sleep(50);
+            } catch (IOException ex){
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public void switchReleased(SwitchEvent se) {
+         
     }
 }
