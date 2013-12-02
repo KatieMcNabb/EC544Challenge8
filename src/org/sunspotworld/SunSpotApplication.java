@@ -30,6 +30,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
      // devices
     private EDemoBoard eDemo = EDemoBoard.getInstance();
     private ISwitch sw2 = (ISwitch)Resources.lookup(ISwitch.class, "SW2"); 
+    private ISwitch sw1 = (ISwitch)Resources.lookup(ISwitch.class, "SW1"); 
     // left servo from driver's view
     private IServo servo1 = new Servo(eDemo.getOutputPins()[EDemoBoard.H1]);
     // right servo from driver's view
@@ -45,6 +46,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
     private static final int SERVO1_HIGH = 20; //steering step high
     private static final int SERVO1_LOW = 10; //steering step low
     private int step1 = SERVO1_LOW;
+    private boolean go = true;
     
     public static final double voltage = 5.0; 
     public static final double scaleFactor = voltage/512;
@@ -80,6 +82,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
         servo1.setValue(1500);
         servo2.setValue(1500);
         sw2.addISwitchListener(this);
+        sw1.addISwitchListener(this);
         
 
 
@@ -114,9 +117,13 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
 
 
     public void switchPressed(SwitchEvent se) {
-        
+        if (se.getSwitch()!=sw2) {
+            System.out.println("switch one called");
+            go = false;
+            return;
+        }
          System.out.println("switch pressed");
-         while(true){
+         while(true && go){
             try {
            dg.reset();
                 double inchesCarRight = -1*(rightCarSensor.getVoltage()/scaleFactor);
@@ -135,6 +142,10 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                 ex.printStackTrace();
             }
         }
+         System.out.println("re-centering servos");
+         servo2.setValue(1500);
+            servo1.setValue(1500);
+         
     }
 
     public void switchReleased(SwitchEvent se) {
