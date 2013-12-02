@@ -86,10 +86,10 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
         
         while (sw2.isOpen())
         {
-                leds.getLED(2).setColor(new LEDColor(255,0,0));    
-                leds.getLED(2).setOn();
-            servo1.setValue(1500);
-        servo2.setValue(1500);
+           leds.getLED(2).setColor(new LEDColor(255,0,0));    
+          leds.getLED(2).setOn();
+          servo1.setValue(1550);
+          servo2.setValue(1500);
         }
         
 
@@ -127,11 +127,9 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
     public void switchPressed(SwitchEvent se) {
         leds.getLED(2).setOff();
         if (se.getSwitch()!=sw2) {
-            System.out.println("switch one called");
             
-         System.out.println("re-centering servos");
-            servo2.setValue(1500);
-            servo1.setValue(1500);
+            //TURN RIGHT
+            servo1.setValue(1375);
             leds.getLED(1).setOff();
         }
          else {
@@ -144,7 +142,8 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
 //                dg.writeDouble(inchesCarRight);
 //                rCon.send(dg);
 //                
-                servo2.setValue(1275);
+                //TURN LEFT
+                servo1.setValue(1800);
                 leds.getLED(1).setColor(new LEDColor(0,0,255));    
                 leds.getLED(1).setOn();
                 
