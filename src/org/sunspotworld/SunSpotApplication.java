@@ -7,6 +7,7 @@ import com.sun.spot.resources.transducers.IAnalogInput;
 import com.sun.spot.resources.transducers.ISwitchListener;
 import com.sun.spot.resources.transducers.ITriColorLED;
 import com.sun.spot.resources.transducers.ITriColorLEDArray;
+import com.sun.spot.resources.transducers.LEDColor;
 import com.sun.spot.resources.transducers.SwitchEvent;
 import com.sun.spot.sensorboard.EDemoBoard;
 import com.sun.spot.sensorboard.peripheral.IServo;
@@ -78,11 +79,18 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
             System.err.println("Caught " + e + " in connection initialization.");
             notifyDestroyed();
         }
-        System.out.println("setting calibration values");
-        servo1.setValue(1500);
-        servo2.setValue(1500);
+        
+        
         sw2.addISwitchListener(this);
         sw1.addISwitchListener(this);
+        
+        while (sw2.isOpen())
+        {
+                leds.getLED(2).setColor(new LEDColor(255,0,0));    
+                leds.getLED(2).setOn();
+            servo1.setValue(1500);
+        servo2.setValue(1500);
+        }
         
 
 
@@ -117,34 +125,35 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
 
 
     public void switchPressed(SwitchEvent se) {
+        leds.getLED(2).setOff();
         if (se.getSwitch()!=sw2) {
             System.out.println("switch one called");
-            go = false;
-            return;
-        }
-         System.out.println("switch pressed");
-         while(true && go){
-            try {
-           dg.reset();
-                double inchesCarRight = -1*(rightCarSensor.getVoltage()/scaleFactor);
-                double inchesCarLeft = (leftCarSensor.getVoltage())/scaleFactor;
-                dg.writeDouble(inchesCarLeft);
-                dg.writeDouble(inchesCarRight);
-                rCon.send(dg);
-                
-        servo2.setValue(1450);
-      
-                
-    System.out.println("forward");
-                
-               // Utils.sleep(50);
-            } catch (IOException ex){
-                ex.printStackTrace();
-            }
-        }
+            
          System.out.println("re-centering servos");
-         servo2.setValue(1500);
+            servo2.setValue(1500);
             servo1.setValue(1500);
+            leds.getLED(1).setOff();
+        }
+         else {
+            
+           //try {
+           //dg.reset();
+//                double inchesCarRight = -1*(rightCarSensor.getVoltage()/scaleFactor);
+//                double inchesCarLeft = (leftCarSensor.getVoltage())/scaleFactor;
+//                dg.writeDouble(inchesCarLeft);
+//                dg.writeDouble(inchesCarRight);
+//                rCon.send(dg);
+//                
+                servo2.setValue(1275);
+                leds.getLED(1).setColor(new LEDColor(0,0,255));    
+                leds.getLED(1).setOn();
+                
+                
+//               // Utils.sleep(50);
+//            } catch (IOException ex){
+//                ex.printStackTrace();
+//            }
+        }
          
     }
 
