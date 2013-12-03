@@ -88,7 +88,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
         {
            leds.getLED(2).setColor(new LEDColor(255,0,0));    
           leds.getLED(2).setOn();
-          servo1.setValue(1550);
+          servo1.setValue(1545);
           servo2.setValue(1500);
         }
         
@@ -125,12 +125,16 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
 
 
     public void switchPressed(SwitchEvent se) {
+        
         leds.getLED(2).setOff();
         if (se.getSwitch()!=sw2) {
             
-            //TURN RIGHT
-            servo1.setValue(1375);
             leds.getLED(1).setOff();
+            try {
+                slideRight();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
          else {
             
@@ -143,19 +147,46 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
 //                rCon.send(dg);
 //                
                 //TURN LEFT
-                servo1.setValue(1800);
                 leds.getLED(1).setColor(new LEDColor(0,0,255));    
                 leds.getLED(1).setOn();
-                
-                
+            try {
+                slideLeft();
 //               // Utils.sleep(50);
 //            } catch (IOException ex){
 //                ex.printStackTrace();
 //            }
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
          
     }
 
+    public void slideLeft() throws InterruptedException
+    {
+        servo2.setValue(1275);
+        servo1.setValue(1800);
+        Thread.sleep(1000);
+        servo1.setValue(1250);
+       Thread.sleep(1000);
+       servo1.setValue(1545);
+       Thread.sleep(1000);
+       servo2.setValue(1500);
+        
+    }
+    
+    public void slideRight() throws InterruptedException
+    {
+        servo2.setValue(1275);
+        servo1.setValue(1250);
+        Thread.sleep(1000);
+        servo1.setValue(1800);
+       Thread.sleep(1000);
+       servo1.setValue(1545);
+       Thread.sleep(1000);
+       servo2.setValue(1500);
+        
+    }
     public void switchReleased(SwitchEvent se) {
          
     }
