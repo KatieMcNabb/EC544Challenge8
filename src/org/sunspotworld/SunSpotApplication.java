@@ -81,16 +81,59 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
         }
         
         
-        sw2.addISwitchListener(this);
-        sw1.addISwitchListener(this);
+       // sw2.addISwitchListener(this);
+       // sw1.addISwitchListener(this);
         
         while (sw2.isOpen())
         {
-           leds.getLED(2).setColor(new LEDColor(255,0,0));    
-          leds.getLED(2).setOn();
-          servo1.setValue(1540);
-          servo2.setValue(1500);
+            try {
+                leds.getLED(2).setColor(new LEDColor(255,0,0));    
+               leds.getLED(2).setOn();
+               servo1.setValue(1540);
+               servo2.setValue(1500);
+               dg.reset();
+                     double inchesCarRight = (rightCarSensor.getVoltage()/scaleFactor);
+                     double inchesCarLeft = (leftCarSensor.getVoltage())/scaleFactor;
+                     dg.writeDouble(inchesCarLeft);
+                     dg.writeDouble(inchesCarRight);
+
+                     rCon.send(dg);
+                     Utils.sleep(1000);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
+        leds.getLED(2).setOff();
+        //drive forward
+        servo2.setValue(1275);
+         while(true){
+       try {
+            
+           //    led.setOn();                        // Blink LED
+           //    Utils.sleep(250);
+           dg.reset();
+                double inchesCarRight = (rightCarSensor.getVoltage()/scaleFactor);
+                double inchesCarLeft = (leftCarSensor.getVoltage())/scaleFactor;
+                dg.writeDouble(inchesCarLeft);
+                dg.writeDouble(inchesCarRight);
+
+                rCon.send(dg);
+                if (inchesCarRight < 20) {
+                    slideRight();
+                }
+                else if (inchesCarLeft < 20) {
+                    slideLeft();
+                }
+                else {
+         
+                }
+               // Utils.sleep(50);
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+     //  Utils.sleep(50);
+        }
+   
         
 
 
@@ -103,30 +146,13 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
 
     protected void destroyApp(boolean unconditional) throws MIDletStateChangeException {
     }
-    
-     private void left() {
-        System.out.println("left");
-        current1 = servo1.getValue();
-        if (current1 + step1 < SERVO1_MAX_VALUE){
-            servo1.setValue(current1+step1);
-        } else {
-            servo1.setValue(SERVO1_MAX_VALUE);
-        }
-    }
-     private void right() {
-        System.out.println("right");
-        current1 = servo1.getValue();
-        if (current1-step1 > SERVO1_MIN_VALUE){
-            servo1.setValue(current1-step1);
-        } else {
-            servo1.setValue(SERVO1_MIN_VALUE);
-        }
-    }
+
 
 
     public void switchPressed(SwitchEvent se) {
         
         leds.getLED(2).setOff();
+        
         if (se.getSwitch()!=sw2) {
             
             leds.getLED(1).setOff();
@@ -165,29 +191,29 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
     public void slideLeft() throws InterruptedException
     {
         //higher servo1 goes left
-        servo2.setValue(1275);
+     //   servo2.setValue(1275);
         servo1.setValue(1800);
         Thread.sleep(2000);
         //turn right
         servo1.setValue(1260);
        Thread.sleep(2000);
        servo1.setValue(1540);
-       Thread.sleep(1000);
-       servo2.setValue(1500);
+      // Thread.sleep(1000);
+       //servo2.setValue(1500);
         
     }
     
     public void slideRight() throws InterruptedException
     {
         //lower servo1 goes right
-        servo2.setValue(1275);
+     //   servo2.setValue(1275);
         servo1.setValue(1260);
         Thread.sleep(2000);
         servo1.setValue(1800);
        Thread.sleep(2000);
        servo1.setValue(1540);
-       Thread.sleep(1000);
-       servo2.setValue(1500);
+     //  Thread.sleep(1000);
+      // servo2.setValue(1500);
         
     }
     public void switchReleased(SwitchEvent se) {
