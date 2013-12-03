@@ -88,7 +88,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
         {
            leds.getLED(2).setColor(new LEDColor(255,0,0));    
           leds.getLED(2).setOn();
-          servo1.setValue(1545);
+          servo1.setValue(1540);
           servo2.setValue(1500);
         }
         
@@ -164,12 +164,14 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
 
     public void slideLeft() throws InterruptedException
     {
+        //higher servo1 goes left
         servo2.setValue(1275);
         servo1.setValue(1800);
         Thread.sleep(1000);
-        servo1.setValue(1250);
+        //turn right
+        servo1.setValue(1260);
        Thread.sleep(1000);
-       servo1.setValue(1545);
+       servo1.setValue(1540);
        Thread.sleep(1000);
        servo2.setValue(1500);
         
@@ -177,12 +179,13 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
     
     public void slideRight() throws InterruptedException
     {
+        //lower servo1 goes right
         servo2.setValue(1275);
-        servo1.setValue(1250);
+        servo1.setValue(1260);
         Thread.sleep(1000);
         servo1.setValue(1800);
        Thread.sleep(1000);
-       servo1.setValue(1545);
+       servo1.setValue(1540);
        Thread.sleep(1000);
        servo2.setValue(1500);
         
