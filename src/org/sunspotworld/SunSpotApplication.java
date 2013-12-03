@@ -86,22 +86,23 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
         
         while (sw2.isOpen())
         {
-            try {
+//            try {
                 leds.getLED(2).setColor(new LEDColor(255,0,0));    
                leds.getLED(2).setOn();
                servo1.setValue(1540);
                servo2.setValue(1500);
-               dg.reset();
-                     double inchesCarRight = (rightCarSensor.getVoltage()/scaleFactor);
-                     double inchesCarLeft = (leftCarSensor.getVoltage())/scaleFactor;
-                     dg.writeDouble(inchesCarLeft);
-                     dg.writeDouble(inchesCarRight);
-
-                     rCon.send(dg);
-                     Utils.sleep(1000);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+//               dg.reset();
+//                     double inchesCarRight = (rightCarSensor.getVoltage()); //ADD scale factor
+//                     double inchesCarLeft = (leftCarSensor.getVoltage());
+//                     dg.writeDouble(inchesCarLeft);
+//                     dg.writeDouble(inchesCarRight);
+//                     System.out.println("right sensor: " +inchesCarRight);
+//                     System.out.println("left sensor: " +inchesCarLeft);
+//                     rCon.send(dg);
+//                    Utils.sleep(1000);
+//            } catch (IOException ex) {
+//                ex.printStackTrace();
+//            }
         }
         leds.getLED(2).setOff();
         //drive forward
@@ -112,16 +113,16 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
            //    led.setOn();                        // Blink LED
            //    Utils.sleep(250);
            dg.reset();
-                double inchesCarRight = (rightCarSensor.getVoltage()/scaleFactor);
-                double inchesCarLeft = (leftCarSensor.getVoltage())/scaleFactor;
+                double inchesCarRight = (rightCarSensor.getVoltage());
+                double inchesCarLeft = (leftCarSensor.getVoltage());
                 dg.writeDouble(inchesCarLeft);
                 dg.writeDouble(inchesCarRight);
 
                 rCon.send(dg);
-                if (inchesCarRight < 20) {
+                if (inchesCarRight > 1.1) {
                     slideRight();
                 }
-                else if (inchesCarLeft < 20) {
+                else if (inchesCarLeft > 1.1) {
                     slideLeft();
                 }
                 else {
@@ -131,7 +132,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
             } catch (Exception ex){
                 ex.printStackTrace();
             }
-     //  Utils.sleep(50);
+       Utils.sleep(2000);
         }
    
         
@@ -193,10 +194,10 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
         //higher servo1 goes left
      //   servo2.setValue(1275);
         servo1.setValue(1800);
-        Thread.sleep(2000);
+        Thread.sleep(1000);
         //turn right
         servo1.setValue(1260);
-       Thread.sleep(2000);
+       Thread.sleep(1000);
        servo1.setValue(1540);
       // Thread.sleep(1000);
        //servo2.setValue(1500);
@@ -208,9 +209,9 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
         //lower servo1 goes right
      //   servo2.setValue(1275);
         servo1.setValue(1260);
-        Thread.sleep(2000);
+        Thread.sleep(1000);
         servo1.setValue(1800);
-       Thread.sleep(2000);
+       Thread.sleep(1000);
        servo1.setValue(1540);
      //  Thread.sleep(1000);
       // servo2.setValue(1500);
