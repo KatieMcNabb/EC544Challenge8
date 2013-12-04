@@ -90,7 +90,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                 leds.getLED(2).setColor(new LEDColor(255,0,0));    
                leds.getLED(2).setOn();
                servo1.setValue(1540);
-               servo2.setValue(1500);
+               servo2.setValue(1600);
 //               dg.reset();
 //                     double inchesCarRight = (rightCarSensor.getVoltage()); //ADD scale factor
 //                     double inchesCarLeft = (leftCarSensor.getVoltage());
@@ -106,7 +106,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
         }
         leds.getLED(2).setOff();
         //drive forward
-        servo2.setValue(1275);
+        servo2.setValue(1530);
          while(true){
        try {
             
@@ -119,11 +119,13 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                 dg.writeDouble(inchesCarRight);
 
                 rCon.send(dg);
-                if (inchesCarRight > 1.1) {
+                if (inchesCarRight > .9) {
                     slideRight();
+                    Utils.sleep(1200);
                 }
                 else if (inchesCarLeft > 1.1) {
                     slideLeft();
+                    Utils.sleep(1200);
                 }
                 else {
          
@@ -132,7 +134,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
             } catch (Exception ex){
                 ex.printStackTrace();
             }
-       Utils.sleep(2000);
+       
         }
    
         
@@ -194,10 +196,10 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
         //higher servo1 goes left
      //   servo2.setValue(1275);
         servo1.setValue(1800);
-        Thread.sleep(1000);
+        Thread.sleep(1200);
         //turn right
         servo1.setValue(1260);
-       Thread.sleep(1000);
+       Thread.sleep(900);
        servo1.setValue(1540);
       // Thread.sleep(1000);
        //servo2.setValue(1500);
@@ -209,7 +211,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
         //lower servo1 goes right
      //   servo2.setValue(1275);
         servo1.setValue(1260);
-        Thread.sleep(1000);
+        Thread.sleep(1200);
         servo1.setValue(1800);
        Thread.sleep(1000);
        servo1.setValue(1540);
