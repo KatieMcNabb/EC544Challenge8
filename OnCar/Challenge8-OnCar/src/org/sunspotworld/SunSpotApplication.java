@@ -85,14 +85,18 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
         servo2.setValue(1530);
          while(true){
        try {
-            
-           dg.reset();
-                double inchesCarRight = (rightCarSensor.getVoltage());
-                double inchesCarLeft = (leftCarSensor.getVoltage());
-                dg.writeDouble(inchesCarLeft);
-                dg.writeDouble(inchesCarRight);
-
-                rCon.send(dg);
+            double leftAvg = 0;
+            double rightAvg = 0;
+            for (int i=0; i<3; i++) {
+                leftAvg += (leftCarSensor.getVoltage())*(.3333);
+                rightAvg += (rightCarSensor.getVoltage())*(.3333);
+                Utils.sleep(100);
+            }
+            double inchesCarRight = leftAvg;
+            double inchesCarLeft = rightAvg;
+            System.out.println("left avg is: " + leftAvg);
+             System.out.println("right avg is: " + rightAvg);
+ 
                 if (inchesCarRight > .9) {
                     slideRight();
                     Utils.sleep(1200);
