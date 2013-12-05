@@ -21,7 +21,7 @@ import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException; 
   
 
-/*Code for on spot that is the remote*/
+/*Code for spot that is the remote*/
 /* switch 1 tells car to drive self
  * switch 2 controls override
    * L(1) green = telling car to drive self
