@@ -51,10 +51,10 @@ public class SunSpotHostApplication {
         // Loop to query database and send info to spots
         while (true) {
             try {
-                int data = queryTable(1);
+                float data = queryTable(1);
                 System.out.println("value in table is " + data);
                 dg.reset();
-                dg.writeInt(data);
+              //  dg.writeInt(data);
                 rCon.send(dg);
                 Utils.sleep(100);
                 
@@ -89,14 +89,15 @@ public class SunSpotHostApplication {
             
             /*Create connection with database*/
             Class.forName("org.sqlite.JDBC");
-            createConnect = DriverManager.getConnection("jdbc:sqlite:/Users/calvinflegal/Developer/ec544/Challenge3/GetDataLED/spotData.db");
+            createConnect = DriverManager.getConnection("jdbc:sqlite:/Users/calvinflegal/Developer/ec544/Challenge8/insertLocation-onDesktop/spotData.db");
             System.out.println("Opened database successfully");
 
             /*Create table sql statement*/
             sqlStatement = createConnect.createStatement();
             String sql = "CREATE TABLE OURDATA"
                     + "(ID             VARCHAR   NOT NULL,"
-                    + "ONOFF           CHAR    NOT NULL, "
+                    + "X           FLOAT    NOT NULL, "
+                    + "Y           FLOAT    NOT NULL, "
                     + "CONSTRAINT pri_id_time PRIMARY KEY(ID))";
             
             /*Execute sql statement and close connection*/
@@ -125,23 +126,23 @@ public class SunSpotHostApplication {
         {
             /*Create connection with database*/
             Class.forName("org.sqlite.JDBC");
-            insertConnection = DriverManager.getConnection("jdbc:sqlite:/Users/calvinflegal/Developer/ec544/Challenge3/GetDataLED/spotData.db");
+            insertConnection = DriverManager.getConnection("jdbc:sqlite:/Users/calvinflegal/Developer/ec544/Challenge8/insertLocation-onDesktop/spotData.db");
             System.out.println("Opened database successfully");
             
             /*Create sql statement*/
             insertStatement = insertConnection.createStatement();
             
             try{
-            String sql = "INSERT INTO OURDATA(ID,ONOFF)" + 
-                    "VALUES('0014.4F01.0000.7FEE',0);";
+            String sql = "INSERT INTO OURDATA(ID,X,Y)" + 
+                    "VALUES('0014.4F01.0000.7FEE',10,10);";
             insertStatement.executeUpdate(sql);
             
-            String sql2 = "INSERT INTO OURDATA(ID,ONOFF)" + 
-            "VALUES('0014.4F01.0000.765E',0);";
+            String sql2 = "INSERT INTO OURDATA(ID,X,Y)" + 
+                    "VALUES('0014.4F01.0000.7FEE',0.7,0.7);";
             insertStatement.executeUpdate(sql2);
             
-            String sql3 = "INSERT INTO OURDATA(ID,ONOFF)" + 
-            "VALUES('0014.4F01.0000.4120',0);";
+            String sql3 = "INSERT INTO OURDATA(ID,X,Y)" + 
+                    "VALUES('0014.4F01.0000.7FEE',0.9,0.9);";
             insertStatement.executeUpdate(sql3);
             }catch(Exception e)
             {
@@ -156,25 +157,25 @@ public class SunSpotHostApplication {
         }
     }
     
-    public static int queryTable(int spotNumber) {
+    public static float queryTable(int spotNumber) {
         java.sql.Connection queryConnection = null;
         Statement queryStatement = null;
 
         try {
             /*Create connection with database*/
             Class.forName("org.sqlite.JDBC");
-            queryConnection = DriverManager.getConnection("jdbc:sqlite:/Users/calvinflegal/Developer/ec544/Challenge3/GetDataLED/spotData.db");
+            queryConnection = DriverManager.getConnection("jdbc:sqlite:/Users/calvinflegal/Developer/ec544/Challenge8/insertLocation-onDesktop/spotData.db");
             System.out.println("Opened database successfully");
 
             /*Create sql statement*/
             queryStatement = queryConnection.createStatement();
 
             if (spotNumber == 1) {
-                String sql = "SELECT ONOFF "
+                String sql = "SELECT X "
                         + "FROM OURDATA "
                         + "WHERE ID = '0014.4F01.0000.7FEE';";
                 ResultSet myResult = queryStatement.executeQuery(sql);
-                int data = myResult.getInt("ONOFF");
+                float data = myResult.getFloat("X");
                 
                 myResult.close();
                 queryStatement.close();
