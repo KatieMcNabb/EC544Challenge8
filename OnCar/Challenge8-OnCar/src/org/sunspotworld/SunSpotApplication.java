@@ -105,6 +105,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                             System.out.println("xtilt is" +srcXtilt);
                             System.out.println("drive self is " +driveSelf);
                             System.out.println("override is " +override);
+                            System.out.println("case num is " + override);
                     } 
                     catch (TimeoutException tex) {        // timeout - display no packet received 
                         leds.getLED(0).setColor(red); 
@@ -217,8 +218,8 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                     leds.getLED(7).setColor(green);
                     leds.getLED(7).setOn();
                     
-                    int servo1Remote = (int) (1540 - (int)180*srcXtilt);
-                    //int servo2Remote = (int) (1540 - 180*srcYtilt);
+                    int servo1Remote = (int) (1540 - (int)240*srcXtilt);
+                    //int servo2Remote = (int) (1600 - (int)180*srcYtilt);
                     servo1.setValue(servo1Remote);
                     servo2.setValue(1500); //for now we will have constant speed
                     //System.out.println("servo value is " + servo1Remote);

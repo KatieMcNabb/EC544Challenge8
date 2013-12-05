@@ -71,7 +71,7 @@ public class RemoteSunSpotApplication extends MIDlet implements ISwitchListener{
         while (xmitDo) { 
             try { 
                 txConn = (RadiogramConnection)Connector.open("radiogram://broadcast:" + BROADCAST_PORT); 
-                txConn.setMaxBroadcastHops(1);      // don't want packets being rebroadcasted 
+                //txConn.setMaxBroadcastHops(1);      // don't want packets being rebroadcasted 
                 Datagram xdg = txConn.newDatagram(txConn.getMaximumLength()); 
                 while (xmitDo) { 
   
@@ -93,7 +93,7 @@ public class RemoteSunSpotApplication extends MIDlet implements ISwitchListener{
                     System.out.println("driveSelf");
                 }
                 System.out.println("xtilt is" + xTilt);
-                pause(100);
+                pause(300);
                 }
             }
                 catch (IOException ex) { 
