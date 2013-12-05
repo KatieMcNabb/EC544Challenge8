@@ -97,11 +97,11 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
             System.out.println("left avg is: " + leftAvg);
              System.out.println("right avg is: " + rightAvg);
  
-                if (inchesCarRight > .9) {
+                if (inchesCarRight > 1.3) {
                     slideRight();
                     Utils.sleep(1200);
                 }
-                else if (inchesCarLeft > 1.1) {
+                else if (inchesCarLeft > 1.3) {
                     slideLeft();
                     Utils.sleep(1200);
                 }
