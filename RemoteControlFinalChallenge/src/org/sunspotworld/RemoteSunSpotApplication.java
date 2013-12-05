@@ -5,13 +5,11 @@ import com.sun.spot.peripheral.TimeoutException;
 import com.sun.spot.peripheral.radio.IRadioPolicyManager; 
 import com.sun.spot.peripheral.radio.RadioFactory; 
 import com.sun.spot.resources.Resources; 
-import com.sun.spot.resources.transducers.ILed; 
 import com.sun.spot.resources.transducers.ISwitch; 
 import com.sun.spot.resources.transducers.ITriColorLED; 
 import com.sun.spot.resources.transducers.LEDColor; 
 import com.sun.spot.resources.transducers.ITriColorLEDArray; 
-import com.sun.spot.resources.transducers.IAccelerometer3D; 
-import com.sun.spot.io.j2me.radiogram.Radiogram; 
+import com.sun.spot.resources.transducers.IAccelerometer3D;
 import com.sun.spot.io.j2me.radiogram.RadiogramConnection; 
 import com.sun.spot.resources.transducers.ISwitchListener;
 import com.sun.spot.resources.transducers.SwitchEvent;
@@ -24,6 +22,12 @@ import javax.microedition.midlet.MIDletStateChangeException;
   
 
 /*Code for on spot that is the remote*/
+/* switch 1 tells car to drive self
+ * switch 2 controls override
+   * L(1) green = telling car to drive self
+   * L(6) green = acting as remote for car
+*/
+
 public class RemoteSunSpotApplication extends MIDlet implements ISwitchListener{ 
   
     private static final String VERSION = "1.0"; 
@@ -49,6 +53,7 @@ public class RemoteSunSpotApplication extends MIDlet implements ISwitchListener{
     private LEDColor blue  = new LEDColor(0,0,50); 
     private double xTilt;
     private double yTilt;
+    
     private boolean override = false;
     private boolean driveSelf = false;
     
@@ -78,8 +83,17 @@ public class RemoteSunSpotApplication extends MIDlet implements ISwitchListener{
                     xdg.writeBoolean(driveSelf);
                     txConn.send(xdg); 
                           
+                if (override)
+                {
+                    System.out.println("overriding");
                     
+                }
+                if (driveSelf)
+                {
+                    System.out.println("driveSelf");
+                }
                 System.out.println("xtilt is" + xTilt);
+                pause(100);
                 }
             }
                 catch (IOException ex) { 
@@ -165,7 +179,10 @@ public class RemoteSunSpotApplication extends MIDlet implements ISwitchListener{
   }
   
   
-   /*handle switch 2 pressed event*/
+   /*handle switch pressed event
+    switch 2 controls override
+    switch 1 tells car to drive self
+    */
     public void switchPressed(SwitchEvent Sw) {
     
       if (Sw.getSwitch().equals(sw2) && override == false)
@@ -183,7 +200,7 @@ public class RemoteSunSpotApplication extends MIDlet implements ISwitchListener{
       }
       else if (Sw.getSwitch().equals(sw1) && driveSelf == false)
       {
-          /*overriding autonomous control*/
+          
           leds.getLED(1).setColor(green);
           leds.getLED(1).setOn();
           driveSelf = true;

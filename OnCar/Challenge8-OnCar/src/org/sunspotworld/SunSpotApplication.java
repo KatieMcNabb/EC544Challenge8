@@ -26,6 +26,10 @@ import javax.microedition.midlet.MIDletStateChangeException;
 /**
  * The startApp method of this class is called by the VM to start the
  * application.
+ * 
+ * L(0) green = driving self
+ * L(2) green = calibrating
+ * L(7) green = overriden by remote
  */
 public class SunSpotApplication extends MIDlet implements ISwitchListener {
     
@@ -97,8 +101,8 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                             srcYtilt = rdg.readDouble();
                             override = rdg.readBoolean(); // are we getting an override message from remote
                             driveSelf = rdg.readBoolean(); // drive self command from remote
-                            System.out.println("xtilt is" +srcXtilt);
                             
+                            System.out.println("xtilt is" +srcXtilt);
                             System.out.println("drive self is " +driveSelf);
                             System.out.println("override is " +override);
                     } 
@@ -152,10 +156,12 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                    //middle light green indicates calibration
                    leds.getLED(2).setColor(green);    
                    leds.getLED(2).setOn();
+                   leds.getLED(0).setOff();
+                   leds.getLED(7).setOff();
                                        
                    servo1.setValue(1550);
                    servo2.setValue(1600);
-                   System.out.println("case 1");
+                   //System.out.println("case 1");
                    break;
                 }//end case 1 code
 
@@ -163,14 +169,14 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                 //case 2 car drives itself
                 case 2:
                 {
-                    System.out.println("case 2");
+                    //System.out.println("case 2");
                     leds.getLED(2).setOff();
                     leds.getLED(7).setOff();
                     leds.getLED(0).setColor(green);
                     leds.getLED(0).setOn();
                     
                     //drive forward
-                    servo2.setValue(1530);
+                    servo2.setValue(1500);
 
                     try {
                         double leftAvg = 0;
@@ -185,8 +191,6 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                             Utils.sleep(50);
                         }
                         
-                        System.out.println("left avg distance: " + leftAvg + " cm");
-                        System.out.println("right avg is: " + rightAvg + " cm");
 
                         if (leftAvg < 56) {
                             slideRight();
@@ -207,16 +211,17 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                 //case three is drive based on remote command     
                 case 3:
                 {
-                    System.out.println("Case 3");
+                    //System.out.println("Case 3");
                     leds.getLED(2).setOff();
                     leds.getLED(0).setOff();
                     leds.getLED(7).setColor(green);
                     leds.getLED(7).setOn();
                     
-                    int servo1Remote = (int)(1540 - 180*srcXtilt);
-                    int servo2Remote = (int) (1540 - 180*srcYtilt);
+                    int servo1Remote = (int) (1540 - (int)180*srcXtilt);
+                    //int servo2Remote = (int) (1540 - 180*srcYtilt);
                     servo1.setValue(servo1Remote);
-                    servo2.setValue(servo2Remote);
+                    servo2.setValue(1500); //for now we will have constant speed
+                    //System.out.println("servo value is " + servo1Remote);
                     
                     break;
                 }//end case 3 code
