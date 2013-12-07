@@ -93,6 +93,7 @@ public class RemoteSunSpotApplication extends MIDlet implements ISwitchListener{
                     System.out.println("driveSelf");
                 }
                 System.out.println("xtilt is" + xTilt);
+                System.out.println("ytilt is" + yTilt);
                 pause(300);
                 }
             }

@@ -218,11 +218,40 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                     leds.getLED(7).setColor(green);
                     leds.getLED(7).setOn();
                     
-                    int servo1Remote = (int) (1540 - (int)240*srcXtilt);
+                    
+                    /* old code */
+                    //int servo1Remote = (int) (1540 - (int)240*srcXtilt);
                     //int servo2Remote = (int) (1600 - (int)180*srcYtilt);
-                    servo1.setValue(servo1Remote);
-                    servo2.setValue(1500); //for now we will have constant speed
-                    //System.out.println("servo value is " + servo1Remote);
+                    //servo1.setValue(servo1Remote);
+                    //servo2.setValue(1500); //for now we will have constant speed
+                    
+                    /*determine xTilt*/
+                    if (srcXtilt < -.2)
+                    {
+                        servo1.setValue(1800);
+                    }
+                    else if (srcXtilt > .2)
+                    {
+                        servo1.setValue(1260);
+                    }
+                    else
+                    {
+                        servo1.setValue(1550);
+                    }
+                    
+                    /*determine yTilt*/
+                    if (srcYtilt < -.3)
+                    {
+                        servo2.setValue(1850);
+                    }
+                    else if (srcYtilt > .3)
+                    {
+                        servo2.setValue(1500);
+                    }
+                    else
+                    {
+                        servo2.setValue(1600);
+                    }
                     
                     break;
                 }//end case 3 code
