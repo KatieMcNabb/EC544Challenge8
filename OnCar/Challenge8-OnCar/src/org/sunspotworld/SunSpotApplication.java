@@ -35,6 +35,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
     
     private static final short PAN_ID               = IRadioPolicyManager.DEFAULT_PAN_ID; 
     private static final String BROADCAST_PORT      = "161"; 
+    private static final String BROADCAST_PORT_BEACON = "162";
     private static final int PACKETS_PER_SECOND     = 1; 
     private static final int PACKET_INTERVAL        = 3000 / PACKETS_PER_SECOND; 
     private int channel = 21; 
@@ -67,6 +68,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
     
     private boolean driveSelf = false;
     private boolean override = false;
+    private boolean turnAtBeacon = false;
     private int caseNum;
     
     private double srcXtilt;
@@ -84,14 +86,22 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
      */
     private void recvLoop () {
         RadiogramConnection rcvConn = null; 
+        RadiogramConnection rcvConnBeacon = null;
+        
         boolean recvDo = true; 
         int nothing = 0; 
+        
         while (recvDo) { 
             try { 
                 rcvConn = (RadiogramConnection)Connector.open("radiogram://:" + BROADCAST_PORT); 
                 rcvConn.setTimeout(PACKET_INTERVAL - 5); 
                 Radiogram rdg = (Radiogram)rcvConn.newDatagram(rcvConn.getMaximumLength()); 
-                  
+                
+                
+                rcvConnBeacon = (RadiogramConnection)Connector.open("radiogram://:" + BROADCAST_PORT_BEACON); 
+                rcvConnBeacon.setTimeout(PACKET_INTERVAL - 5); 
+                Radiogram rdgBeacon = (Radiogram)rcvConnBeacon.newDatagram(rcvConn.getMaximumLength()); 
+                
                 while (recvDo) {
                     try {   
                             rdg.reset(); 
@@ -102,10 +112,13 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                             override = rdg.readBoolean(); // are we getting an override message from remote
                             driveSelf = rdg.readBoolean(); // drive self command from remote
                             
-                            System.out.println("xtilt is" +srcXtilt);
                             System.out.println("drive self is " +driveSelf);
                             System.out.println("override is " +override);
-                            System.out.println("case num is " + override);
+                            
+                            rdgBeacon.reset();
+                            rcvConnBeacon.receive(rdgBeacon);
+                            turnAtBeacon = rdgBeacon.readBoolean();
+                            System.out.println("turn at beacon is " + turnAtBeacon);
                     } 
                     catch (TimeoutException tex) {        // timeout - display no packet received 
                         leds.getLED(0).setColor(red); 
@@ -138,6 +151,13 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
             {
                 caseNum = 1;
             }
+            else if (driveSelf == true && override == false && turnAtBeacon == true)
+                //turn  if the beacon is tripeed
+            {
+                caseNum = 4;
+                
+            }
+            
             else if (driveSelf == true && override == false)
             {
                 caseNum = 2;
@@ -255,6 +275,17 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                     
                     break;
                 }//end case 3 code
+                case 4:
+                {
+                try {
+                    //turn corner
+                    TurnLeft();
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+                    break;
+                }
+                
             }
         }
     }
@@ -323,6 +354,48 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
        servo1.setValue(1550);
 
     }
+    
+     public void TurnLeft() throws InterruptedException//2
+    {
+        System.out.println("turn left");
+                
+        servo2.setValue(1500);
+        servo1.setValue(1800);
+        Thread.sleep(1600);
+        //turn left
+        
+        servo2.setValue(1600);
+        Thread.sleep(500);
+        //stop
+        
+        servo1.setValue(1260);
+        Thread.sleep(500);
+        //wheel turn right
+        
+        servo2.setValue(1850);
+        Thread.sleep(700);
+        //backword right
+        
+        servo2.setValue(1600);
+        Thread.sleep(500);
+        //stop
+        
+        servo1.setValue(1800);
+        Thread.sleep(1250);
+        //wheel turn left
+        
+        servo2.setValue(1500);
+        Thread.sleep(1600);
+        //turn left (back to straight) 
+
+        servo1.setValue(1540);
+        Thread.sleep(1000);
+       //go straight
+       
+       servo2.setValue(1600);
+       //stop 
+    }
+     
     public void switchReleased(SwitchEvent se) {
          
     }

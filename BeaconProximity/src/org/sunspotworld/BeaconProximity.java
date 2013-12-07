@@ -47,7 +47,7 @@ public class BeaconProximity extends MIDlet {
     // CHANNEL_NUMBER  default as 26, each group set their own correspondingly
     private static final int CHANNEL_NUMBER = IProprietaryRadio.DEFAULT_CHANNEL;
     private static final short PAN_ID = IRadioPolicyManager.DEFAULT_PAN_ID;
-    private static final String BROADCAST_PORT = "161";
+    private static final String BROADCAST_PORT = "162";
     private static final int PACKETS_PER_SECOND = 1;
     private static final int PACKET_INTERVAL = 200 / PACKETS_PER_SECOND;
     //   private static AODVManager aodv = AODVManager.getInstance();
@@ -92,123 +92,24 @@ public class BeaconProximity extends MIDlet {
         while (true) {
             try {
                 double vol = proximity.getVoltage();
-                //System.out.println("Output voltage = " + vol + " V");
-                //dis = 18.67 / (vol + 0.167);
+                
                 dis = p1 * (pow(vol, 3)) + p2 * (pow(vol, 2)) + p3 * vol + p4;
                 System.out.println("Distance = " + dis + " cm");
-                Utils.sleep(1000);
+                Utils.sleep(50);
             } catch (IOException ex) {
                 ex.printStackTrace();
-            }
-            /*if (sw1.isClosed()) {
-            notifyDestroyed();                      // cause the MIDlet to exit
-            }*/
-        }
-    }
-
-    private void recvLoop() {
-        RadiogramConnection rcvConn = null;
-        RadiogramConnection txConn = null;
-        recvDo = true;
-        int nothing = 0;
-        while (recvDo) {
-            try {
-                System.out.println("Ready to get response.");
-                rcvConn = (RadiogramConnection) Connector.open("radiogram://:" + BROADCAST_PORT);
-                rcvConn.setTimeout(PACKET_INTERVAL - 5);
-                Radiogram rdg = (Radiogram) rcvConn.newDatagram(rcvConn.getMaximumLength());
-                while (recvDo) {
-                    try {
-                        rdg.reset();
-                        rcvConn.receive(rdg);           // listen for a packet
-                        statusLED.setColor(green);
-                        statusLED.setOn();
-                        long srcAddr = rdg.readLong(); // src MAC address
-                        long srcTime = rdg.readLong(); // src's timestamp
-                        boolean srcRequest = rdg.readBoolean(); // src's REQUEST BIT
-                        int pow = rdg.readInt();
-                        receiveLED.setColor(green);
-                        Utils.sleep(500);
-                        receiveLED.setOn();
-                        Utils.sleep(500);
-                        sendLED.setOff();
-                        //if receive a query, give response
-                        if (true) {
-                            try {
-                                txConn = (RadiogramConnection) Connector.open("radiogram://broadcast:" + BROADCAST_PORT);
-                                txConn.setMaxBroadcastHops(1);      // don't want packets being rebroadcasted
-                                Datagram xdg = txConn.newDatagram(txConn.getMaximumLength());
-                                TimeStamp = System.currentTimeMillis();
-                                xdg.reset();
-                                xdg.writeLong(myAddr); // own MAC address
-                                xdg.writeLong(TimeStamp); // current timestamp
-                                if(dis<50)
-                                    Turn = true;
-                                else Turn = false;
-                                xdg.writeBoolean(Turn);
-                                xdg.writeBoolean(false);//current distance messured
-                                //xdg.writeInt(power); // own power
-                                
-                                System.out.println("dis:    "+dis+" turn"+Turn);
-                                
-                                txConn.send(xdg);
-                                sendLED.setColor(blue);
-                                Utils.sleep(200);
-                                sendLED.setOn();
-                                Utils.sleep(200);
-                                sendLED.setOff();
-                                long delay = (TimeStamp + PACKET_INTERVAL - System.currentTimeMillis()) - 2;
-                                if (delay > 0) {
-                                    pause(delay);
-                                }
-                                leds.getLED(7).setOff();
-                            } catch (IOException ex) {
-                                // ignore
-                            } finally {
-                                if (txConn != null) {
-                                    try {
-                                        txConn.close();
-                                    } catch (IOException ex) {
-                                    }
-                                }
-                            }
-                        }
-
-                        String srcID = IEEEAddress.toDottedHex(srcAddr);
-                        nothing = 0;
-                    } catch (TimeoutException tex) {        // timeout - display no packet received
-                        System.out.println("Time out.");
-                        statusLED.setColor(red);
-                        statusLED.setOn();
-                        nothing++;
-                        if (nothing > 2 * PACKETS_PER_SECOND && !ledsInUse) {
-                            for (int ledint = 1; ledint <= 7; ledint++) { // if nothing received eventually turn off LEDs
-                                leds.getLED(ledint).setOff();
-                            }
-                        }
-                    }
-                }
-            } catch (IOException ex) {
-                // ignore
-            } finally {
-                if (rcvConn != null) {
-                    try {
-                        rcvConn.close();
-                    } catch (IOException ex) {
-                    }
-                }
             }
         }
     }
 
     private void xmitLoop () {
- //       ILed led = Spot.getInstance().getGreenLed();
+ 
         System.out.println("xmit loop entered ");
         RadiogramConnection txConn = null;
-        //xmitDo = true;
+        
         while (true) {
             try {
-                System.out.println("xmitting!!!!!!!!!!!!!!!!!!! ");
+                
                 txConn = (RadiogramConnection)Connector.open("radiogram://broadcast:" + BROADCAST_PORT);
                 txConn.setMaxBroadcastHops(1);      // don't want packets being rebroadcasted
                 Datagram xdg = txConn.newDatagram(txConn.getMaximumLength());
@@ -218,25 +119,22 @@ public class BeaconProximity extends MIDlet {
                     TimeStamp = System.currentTimeMillis();
 
                     xdg.reset();
-                    xdg.writeLong(myAddr); // own MAC address
-//                    xdg.writeLong(TimeStamp); // current timestamp
-//                    xdg.writeBoolean(xmitDo);
-//                    
-//                    xdg.writeInt(power);
-                    xdg.writeBoolean(false);
-                    xdg.writeBoolean(true);
-                    if(dis<50)
+                    if(dis<90)
+                    {
                         Turn = true;
-                    else Turn = false;
+                        leds.getLED(1).setColor(red);
+                        leds.getLED(1).setOn();
+                    }
+                    
+                    else 
+                    {
+                        Turn = false;
+                        leds.getLED(1).setOff();
+                    }
                     xdg.writeBoolean(Turn);
                     txConn.send(xdg);
-//                    led.setOff();
-                    pause(100);
-                    receiveLED.setOff();   
-                    long delay = (TimeStamp+ PACKET_INTERVAL- System.currentTimeMillis());
-                    if (delay > 0) {
-                        pause(delay);
-                    }
+                    pause(300);
+                    
             } catch (IOException ex) {
                 // ignore
             } finally {
