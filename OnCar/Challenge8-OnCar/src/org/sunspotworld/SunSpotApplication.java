@@ -215,10 +215,16 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
 
                         if (leftAvg < 56) {
                             slideRight();
-                            Utils.sleep(1200);
+                            if (!turnAtBeacon)
+                            {
+                                Utils.sleep(1200);
+                            }
                         } else if (rightAvg < 60) {
                             slideLeft();
-                            Utils.sleep(1200);
+                            if (!turnAtBeacon)
+                            {
+                                Utils.sleep(1200);
+                            }
                         }
                     } catch (Exception ex) {
                         ex.printStackTrace();
@@ -279,7 +285,12 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                 {
                 try {
                     //turn corner
+                    //flash blue while turning
+                    leds.getLED(3).setColor(blue);
+                    leds.getLED(3).setOn();
                     TurnLeft();
+                    leds.getLED(3).setOff();
+                    
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
@@ -328,31 +339,55 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
 
     public void slideLeft() throws InterruptedException
     {
+        if (!turnAtBeacon)
+        {
         //turn right
         servo1.setValue(1800);
         Thread.sleep(1200);
-        
+        }
+        else
+        {
+            return;
+        }
+        if (!turnAtBeacon)
+        {
         //then turn back left
         servo1.setValue(1260);
-       Thread.sleep(900);
-       
+        Thread.sleep(900);
+        }
+        else {
+            return;
+        }
+                    
        //straighten
        servo1.setValue(1550);
+        
     }
     
     public void slideRight() throws InterruptedException
     {
-        //turn right
-        servo1.setValue(1260);
-        Thread.sleep(1200);
-        
+        if (!turnAtBeacon)
+        {
+            //turn right
+            servo1.setValue(1260);
+            Thread.sleep(1200);
+        }
+        else{
+            return;
+        }
+        if(!turnAtBeacon)
+        {
         //turn back left
         servo1.setValue(1800);
-       Thread.sleep(1000);
-       
-       //straighten
-       servo1.setValue(1550);
-
+        Thread.sleep(1000);
+        }
+        else {
+            return;
+        }
+        
+           //straighten
+            servo1.setValue(1550);
+        
     }
     
      public void TurnLeft() throws InterruptedException//2

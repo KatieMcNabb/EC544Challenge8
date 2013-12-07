@@ -95,6 +95,38 @@ public class BeaconProximity extends MIDlet {
                 
                 dis = p1 * (pow(vol, 3)) + p2 * (pow(vol, 2)) + p3 * vol + p4;
                 System.out.println("Distance = " + dis + " cm");
+                if(dis<155)
+                    {
+                        //take two more
+                        vol = proximity.getVoltage();
+                        dis = p1 * (pow(vol, 3)) + p2 * (pow(vol, 2)) + p3 * vol + p4;
+                        if (dis <155) {
+                            //two passes in a row
+                            vol = proximity.getVoltage();
+                            dis = p1 * (pow(vol, 3)) + p2 * (pow(vol, 2)) + p3 * vol + p4;
+                            if (dis<155) {
+                                //three in a row wow!
+                                Turn = true;
+                                pause(1000);
+                                
+                            }
+                            else {
+                                //two pass one fail
+                                Turn = false;
+                            }
+                            
+                        }
+                        else {
+                            //one pass one fail
+                            Turn = false;
+                        }
+                    }
+                    
+                    else 
+                    //0 in a row
+                    {
+                        Turn = false;
+                    }
                 Utils.sleep(50);
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -109,7 +141,7 @@ public class BeaconProximity extends MIDlet {
         
         while (true) {
             try {
-                
+                leds.getLED(1).setOff();
                 txConn = (RadiogramConnection)Connector.open("radiogram://broadcast:" + BROADCAST_PORT);
                 txConn.setMaxBroadcastHops(1);      // don't want packets being rebroadcasted
                 Datagram xdg = txConn.newDatagram(txConn.getMaximumLength());
@@ -119,18 +151,11 @@ public class BeaconProximity extends MIDlet {
                     TimeStamp = System.currentTimeMillis();
 
                     xdg.reset();
-                    if(dis<90)
-                    {
-                        Turn = true;
+                    if (Turn == true) {
                         leds.getLED(1).setColor(red);
                         leds.getLED(1).setOn();
                     }
                     
-                    else 
-                    {
-                        Turn = false;
-                        leds.getLED(1).setOff();
-                    }
                     xdg.writeBoolean(Turn);
                     txConn.send(xdg);
                     pause(300);
