@@ -67,6 +67,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
     
     private boolean driveSelf = false;
     private boolean override = false;
+    private boolean TurnSign = false;
     private int caseNum;
     
     private double srcXtilt;
@@ -94,6 +95,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                   
                 while (recvDo) {
                     try {   
+                            System.out.println("receive!");
                             rdg.reset(); 
                             rcvConn.receive(rdg);
                             long srcAddr = rdg.readLong(); // src MAC address 
@@ -101,6 +103,8 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                             srcYtilt = rdg.readDouble();
                             override = rdg.readBoolean(); // are we getting an override message from remote
                             driveSelf = rdg.readBoolean(); // drive self command from remote
+                            TurnSign = rdg.readBoolean();
+                            
                             
                             System.out.println("xtilt is" +srcXtilt);
                             System.out.println("drive self is " +driveSelf);
@@ -118,7 +122,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                     } 
                 } 
             } catch (IOException ex) { 
-                // ignore 
+                ex.printStackTrace();
             } finally { 
                 if (rcvConn != null) { 
                     try { 
@@ -191,18 +195,24 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                             Utils.sleep(50);
                         }
                         
-
-                        if (leftAvg < 56) {
-                            slideRight();
-                            Utils.sleep(1200);
-                        } else if (rightAvg < 60) {
-                            slideLeft();
-                            Utils.sleep(1200);
+                        if(TurnSign = false){
+                            if (leftAvg < 56) {
+                                slideRight();
+                                Utils.sleep(1200);
+                            } else if (rightAvg < 60) {
+                                slideLeft();
+                                Utils.sleep(1200);
+                            }
+                        }else {
+                            TurnLeft();
+                            TurnSign = false;
+                            }
                         }
-                    } catch (Exception ex) {
+                    catch (Exception ex) {
                         ex.printStackTrace();
 
                     }
+
 
                 break;
               }//end case 2 code
@@ -334,5 +344,48 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
         }
         // Return our estimate
         return n;
+
+    }
+    
+        public void TurnLeft() throws InterruptedException//2
+    {
+        System.out.println("turning left!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        servo2.setValue(1275);
+        servo1.setValue(1800);
+        Thread.sleep(1600);
+        //turn left
+        
+        servo2.setValue(1500);
+        Thread.sleep(500);
+        //stop
+        
+        servo1.setValue(1260);
+        Thread.sleep(500);
+        //wheel turn right
+        
+        servo2.setValue(1720);
+        Thread.sleep(700);
+        //backword right
+        
+        servo2.setValue(1500);
+        Thread.sleep(500);
+        //stop
+        
+        servo1.setValue(1800);
+        Thread.sleep(1250);
+        //wheel turn left
+        
+        servo2.setValue(1275);
+        Thread.sleep(1600);
+        //turn left (back to straight) 
+
+        servo1.setValue(1540);
+        Thread.sleep(1000);
+       //go straight
+       
+       servo2.setValue(1500);
+       //stop 
     }
 }
+
+
