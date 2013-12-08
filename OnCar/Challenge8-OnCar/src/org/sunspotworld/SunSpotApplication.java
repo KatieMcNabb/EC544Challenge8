@@ -120,13 +120,45 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
             }
         }
     }
-    
+     /*
+      * loop to receive from beacon
+      */
+    private void receiveBeaconLoop () {
+            System.out.println("receiving beacon loop entered ");
+            RadiogramConnection rcvConnBeacon = null;
+            
+            
+            while (true) {
+                try {
+                    rcvConnBeacon = (RadiogramConnection)Connector.open("radiogram://:" + BROADCAST_PORT_BEACON); 
+                    rcvConnBeacon.setTimeout(PACKET_INTERVAL - 5); 
+                    Radiogram rdgBeacon = (Radiogram)rcvConnBeacon.newDatagram(rcvConnBeacon.getMaximumLength()); 
+                    rdgBeacon.reset();
+                    rcvConnBeacon.receive(rdgBeacon);
+                    turnAtBeacon = rdgBeacon.readBoolean();
+                    beaconSrcAddress = rdgBeacon.readLong();
+                    System.out.println("turn at beacon is " + turnAtBeacon);
+       
+                       
+                } catch (IOException ex) {
+                    // ignore
+                } finally {
+                    if (rcvConnBeacon != null) {
+                        try {
+                            rcvConnBeacon.close();
+                        } catch (IOException ex) { }
+                    }
+                }
+            }
+       
+    }
     /*
-     * loop to receive data from the 
+     * loop to receive data from the remote
      */
-    private void recvLoop () {
+    private void recvRemoteLoop () {
         RadiogramConnection rcvConn = null; 
-        RadiogramConnection rcvConnBeacon = null;
+        
+        
         
         boolean recvDo = true; 
         int nothing = 0; 
@@ -136,12 +168,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                 rcvConn = (RadiogramConnection)Connector.open("radiogram://:" + BROADCAST_PORT); 
                 rcvConn.setTimeout(PACKET_INTERVAL - 5); 
                 Radiogram rdg = (Radiogram)rcvConn.newDatagram(rcvConn.getMaximumLength()); 
-                
-                
-                rcvConnBeacon = (RadiogramConnection)Connector.open("radiogram://:" + BROADCAST_PORT_BEACON); 
-                rcvConnBeacon.setTimeout(PACKET_INTERVAL - 5); 
-                Radiogram rdgBeacon = (Radiogram)rcvConnBeacon.newDatagram(rcvConn.getMaximumLength()); 
-                
+
                 while (recvDo) {
                     try {   
                             rdg.reset(); 
@@ -155,11 +182,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                             System.out.println("drive self is " +driveSelf);
                             System.out.println("override is " +override);
                             
-                            rdgBeacon.reset();
-                            rcvConnBeacon.receive(rdgBeacon);
-                            turnAtBeacon = rdgBeacon.readBoolean();
-                            beaconSrcAddress = rdgBeacon.readLong();
-                            System.out.println("turn at beacon is " + turnAtBeacon);
+                            
                     } 
                     catch (TimeoutException tex) {        // timeout - display no packet received 
                         leds.getLED(0).setColor(red); 
@@ -364,7 +387,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
   
         new Thread() { 
             public void run () { 
-                recvLoop(); 
+                recvRemoteLoop(); 
             } 
         }.start();                      // spawn a thread to receive packets 
 
@@ -379,6 +402,12 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                 stateMachineLoop(); 
             } 
         }.start();                      // spawn a thread to operate car control state machine
+        new Thread() { 
+            public void run () { 
+                receiveBeaconLoop(); 
+            } 
+        }.start();                      // spawn a thread to operate car control state machine
+ 
  
     }
 
