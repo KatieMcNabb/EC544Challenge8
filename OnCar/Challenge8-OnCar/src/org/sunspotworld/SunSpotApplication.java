@@ -36,6 +36,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
     private static final short PAN_ID               = IRadioPolicyManager.DEFAULT_PAN_ID; 
     private static final String BROADCAST_PORT      = "161"; 
     private static final String BROADCAST_PORT_BEACON = "162";
+    private static final String BROADCAST_PORT_BASESTATION = "163";
     private static final int PACKETS_PER_SECOND     = 1; 
     private static final int PACKET_INTERVAL        = 3000 / PACKETS_PER_SECOND; 
     private int channel = 21; 
@@ -69,6 +70,8 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
     private boolean driveSelf = false;
     private boolean override = false;
     private boolean turnAtBeacon = false;
+    private boolean didStartDriving = false;
+    private long beaconSrcAddress; 
     private int caseNum;
     
     private double srcXtilt;
@@ -80,6 +83,43 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
         run();
      }
     
+    
+    /*
+     * transmit to basestation for our visual display.
+     */
+     private void xmitLoop () {
+ 
+        System.out.println("xmit loop entered ");
+        RadiogramConnection txConn = null;
+        
+        while (true) {
+            try {
+                
+                txConn = (RadiogramConnection)Connector.open("radiogram://broadcast:" + BROADCAST_PORT_BASESTATION);
+                txConn.setMaxBroadcastHops(1);      // don't want packets being rebroadcasted
+                Datagram xdg = txConn.newDatagram(txConn.getMaximumLength());
+
+                    xdg.reset();
+
+                    xdg.writeBoolean(turnAtBeacon);
+                    xdg.writeBoolean(didStartDriving);
+                    xdg.writeLong(beaconSrcAddress);
+                    txConn.send(xdg);
+                    didStartDriving = false;
+                    pause(300);
+                    //System.out.println("trasnsmitting" + beaconSrcAddress + turnAtBeacon + didStartDriving);
+                   
+            } catch (IOException ex) {
+                // ignore
+            } finally {
+                if (txConn != null) {
+                    try {
+                        txConn.close();
+                    } catch (IOException ex) { }
+                }
+            }
+        }
+    }
     
     /*
      * loop to receive data from the 
@@ -118,6 +158,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                             rdgBeacon.reset();
                             rcvConnBeacon.receive(rdgBeacon);
                             turnAtBeacon = rdgBeacon.readBoolean();
+                            beaconSrcAddress = rdgBeacon.readLong();
                             System.out.println("turn at beacon is " + turnAtBeacon);
                     } 
                     catch (TimeoutException tex) {        // timeout - display no packet received 
@@ -190,6 +231,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                 //case 2 car drives itself
                 case 2:
                 {
+                    didStartDriving = true;
                     //System.out.println("case 2");
                     leds.getLED(2).setOff();
                     leds.getLED(7).setOff();
@@ -328,6 +370,12 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
 
         new Thread() { 
             public void run () { 
+                xmitLoop(); 
+            } 
+        }.start();                      // spawn a thread to receive packets 
+        
+        new Thread() { 
+            public void run () { 
                 stateMachineLoop(); 
             } 
         }.start();                      // spawn a thread to operate car control state machine
@@ -437,6 +485,12 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
 
     public void switchPressed(SwitchEvent se) {
 }
+   
+    private void pause (long time) { 
+        try { 
+            Thread.currentThread().sleep(time); 
+        } catch (InterruptedException ex) { /* ignore */ } 
+    } 
     public double pow(double x, double y) {
         int den = 1024; //declare the denominator to be 1024  
         /*Conveniently 2^10=1024, so taking the square root 10  

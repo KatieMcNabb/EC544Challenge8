@@ -157,6 +157,7 @@ public class BeaconProximity extends MIDlet {
                     }
                     
                     xdg.writeBoolean(Turn);
+                    xdg.writeLong(myAddr);
                     txConn.send(xdg);
                     pause(300);
                     
