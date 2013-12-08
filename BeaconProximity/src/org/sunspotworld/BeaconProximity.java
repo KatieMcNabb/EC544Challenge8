@@ -156,10 +156,14 @@ public class BeaconProximity extends MIDlet {
                         leds.getLED(1).setOn();
                     }
                     
-                    xdg.writeBoolean(Turn);
-                    xdg.writeLong(myAddr);
-                    txConn.send(xdg);
+                    if (Turn==true) {
+                        xdg.writeBoolean(Turn);
+                        xdg.writeLong(myAddr);
+                        txConn.send(xdg);
+                        
+                    }
                     pause(300);
+                    
                     
             } catch (IOException ex) {
                 // ignore
@@ -237,7 +241,7 @@ public class BeaconProximity extends MIDlet {
     public double pow(double x, double y) {
         int den = 1024; //declare the denominator to be 1024  
         /*Conveniently 2^10=1024, so taking the square root 10  
-        times will yield our estimate for n.¡¡In our example  
+        times will yield our estimate for n.??In our example  
         n^3=8^2n^1024 = 8^683.*/
         int num = (int) (y * den); // declare numerator
         int iterations;
@@ -245,8 +249,8 @@ public class BeaconProximity extends MIDlet {
         double n = Double.MAX_VALUE; /* we initialize our
          * estimate, setting it to max*/
         while (n >= Double.MAX_VALUE && iterations > 1) {
-            /*¡¡We try to set our estimate equal to the right
-             * hand side of the equation (e.g., 8^2048).¡¡If this
+            /*??We try to set our estimate equal to the right
+             * hand side of the equation (e.g., 8^2048).??If this
              * number is too large, we will have to rescale. */
             n = x;
             for (int i = 1; i < num; i++) {

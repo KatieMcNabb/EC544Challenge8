@@ -355,6 +355,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                     leds.getLED(3).setOn();
                     TurnLeft();
                     leds.getLED(3).setOff();
+                    turnAtBeacon = false;
                     
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
