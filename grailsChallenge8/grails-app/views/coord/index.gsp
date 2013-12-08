@@ -15,10 +15,24 @@
                 
   </head>
   <body>
-    <h1>
-      <div id="testme">Pick One:</div></h1>
-    <h2><a href="/challenge2/chart/live/">Live</a></h2>
-    <h2><a href="/challenge2/chart/historical/">Historical</a></h2>
-    <di
+    <h1> <div id="testme">Map</div></h1>
+    <canvas id="myCanvas" width="600" height="400"></canvas>
+    <script>
+      window.setInterval(function(){
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext('2d');
+         //clear canvas
+         context.clearRect(0, 0, canvas.width, canvas.height);
+         
+         //fetch it
+         $.getJSON("/challenge8/coord/getCoords",function(data){
+           //draw from the data
+           console.log(data);
+           context.fillRect(data.x,data.y,10,10);
+         });
+         
+      },1000);
+      
+      </script>
   </body>
 </html>

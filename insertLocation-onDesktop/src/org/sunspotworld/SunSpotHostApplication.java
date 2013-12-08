@@ -7,14 +7,19 @@
 package org.sunspotworld;
 
 import com.sun.spot.io.j2me.radiogram.*;
+import com.sun.spot.peripheral.Spot;
 import javax.microedition.midlet.MIDletStateChangeException;
 import com.sun.spot.peripheral.ota.OTACommandServer;
+import com.sun.spot.peripheral.radio.IRadioPolicyManager;
+import com.sun.spot.peripheral.radio.RadioFactory;
+import com.sun.spot.peripheral.radio.RadioPolicyManager;
 import com.sun.spot.util.Utils;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Timer;
 import javax.microedition.io.*;
 
 
@@ -27,40 +32,37 @@ import javax.microedition.io.*;
 public class SunSpotHostApplication {
 
     // Broadcast port on which we listen for sensor samples
-    private static final int HOST_PORT = 65;
+    private static final int HOST_PORT = 163;
+    private static final int PACKETS_PER_SECOND     = 1; 
+    private static final int PACKET_INTERVAL        = 3000 / PACKETS_PER_SECOND; 
+    private static final short PAN_ID               = IRadioPolicyManager.DEFAULT_PAN_ID; 
+    private int channel = 21; 
+    private int power = 32;  
         
     private void run() throws Exception {
-        RadiogramConnection rCon;
-        Datagram dg;
+        IRadioPolicyManager rpm = RadioFactory.getRadioPolicyManager();
+        rpm.setChannelNumber(channel); 
+        rpm.setPanId(PAN_ID); 
+        rpm.setOutputPower(power - 32); 
+    RadiogramConnection rCon = (RadiogramConnection)Connector.open("radiogram://:" + HOST_PORT); 
+        rCon.setTimeout(PACKET_INTERVAL - 5); 
+        Radiogram rdg = (Radiogram)rCon.newDatagram(rCon.getMaximumLength()); 
         
-         
-        try {
-            // Open up a server-side broadcast radiogram connection
-            // to listen for sensor readings being sent by different SPOTs
-            rCon = (RadiogramConnection) Connector.open("radiogram://broadcast:" + HOST_PORT);
-            dg = rCon.newDatagram(50);
-        } catch (Exception e) {
-             System.err.println("setUp caught " + e.getMessage());
-             throw e;
-        }
-
-        //Create initial table and insert data into that table
-        createTable();
-        insertInitialDataTable();
-        
-        // Loop to query database and send info to spots
+        // Loop to read datagrams
         while (true) {
             try {
-                float data = queryTable(1);
-                System.out.println("value in table is " + data);
-                dg.reset();
-              //  dg.writeInt(data);
-                rCon.send(dg);
-                Utils.sleep(100);
+                
+               rdg.reset(); 
+                rCon.receive(rdg);
+                boolean turnAtBeacon = rdg.readBoolean(); // src MAC address 
+                boolean didStartDriving = rdg.readBoolean(); // src MAC address
+                long beaconAddr = rdg.readLong();
+                System.out.println("turnAtBeacon: " + turnAtBeacon + " DidStartDrving: "
+                        + didStartDriving + " beacon addr: " + beaconAddr);
+                Timer timer = new Timer();
                 
             } catch (Exception e) {
                 System.err.println("Caught " + e +  " while reading sensor samples.");
-                throw e;
             }
         }
     }

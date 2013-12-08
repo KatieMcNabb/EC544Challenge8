@@ -8,7 +8,7 @@ class CoordController {
     render(view:'index')
     //render(view:'index',model:[test1:"hi"])
     }
-    def nexttime1 () {
+    def getCoords () {
         
         DatabaseReaderHelper helper = new DatabaseReaderHelper();
         //render();
@@ -17,7 +17,7 @@ class CoordController {
         Float x = collection.get(0);
         Float y = collection.get(collection.size()-1);
         String output = new String(x+" "  +y);
-        render(output);
+        render("{\"x\": "+ x + ", \"y\":" + y + "}");
     }
  
 }
