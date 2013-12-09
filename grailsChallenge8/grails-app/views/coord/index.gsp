@@ -16,14 +16,14 @@
   </head>
   <body>
     <h1> <div id="testme">Map</div></h1>
-    <canvas id="myCanvas" width="600" height="400"></canvas>
+    <canvas id="myCanvas" width="600" height="400" style="border:10px solid;"></canvas>
     <script>
       window.setInterval(function(){
         var canvas = document.getElementById('myCanvas');
         var context = canvas.getContext('2d');
          //clear canvas
          context.clearRect(0, 0, canvas.width, canvas.height);
-         
+         context.fillRect(80,80, 440,240);
          //fetch it
          $.getJSON("/challenge8/coord/getCoords",function(data){
            //draw from the data

@@ -262,6 +262,12 @@ public class SunSpotHostApplication {
             Class.forName("org.sqlite.JDBC");
             queryConnection = DriverManager.getConnection("jdbc:sqlite:/Users/calvinflegal/Developer/ec544/Challenge8/insertLocation-onDesktop/spotData.db");
             //System.out.println("Opened database successfully");
+            
+            //error guard our values..
+            if (xpos < 40) xpos = 40;
+            if (xpos > 560) xpos = 560;
+            if (ypos< 40) ypos = 40;
+            if (ypos > 360) ypos = 360;
 
             /*Create sql statement*/
             queryStatement = queryConnection.createStatement();
