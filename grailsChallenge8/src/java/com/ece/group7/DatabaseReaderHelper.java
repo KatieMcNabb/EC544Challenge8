@@ -26,7 +26,7 @@ public class DatabaseReaderHelper {
             if (sunspotId == 1) {
                 ResultSet rs = stmt.executeQuery("SELECT X,Y "
                         + "FROM OURDATA "
-                        + "WHERE ID = '0014.4F01.0000.7FEE';");
+                        + "WHERE ID = '1';");
                 
                 while (rs.next()) {
                     Float x =new Float(rs.getFloat("X"));

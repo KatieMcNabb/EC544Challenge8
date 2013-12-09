@@ -31,7 +31,7 @@
            context.fillRect(data.x,data.y,10,10);
          });
          
-      },1000);
+      },500);
       
       </script>
   </body>
