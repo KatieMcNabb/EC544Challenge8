@@ -237,6 +237,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                 //calibrates
                 case 1:
                 {
+                    turnAtBeacon = false;
                     didStartDriving = false;
                    //middle light green indicates calibration
                    leds.getLED(2).setColor(green);    
