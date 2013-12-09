@@ -133,7 +133,7 @@ public class SunSpotHostApplication {
 
     public void updateDBLoop() {
         createTable();
-        insertInitialDataTable();
+        updateTable();
         motionTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -155,18 +155,20 @@ public class SunSpotHostApplication {
                         //if we're moving
                         if (didStartDriving) {
                             ypos -= 15;
-                            updateTable();
+                            
                             
                         }
+                        updateTable();
                         break;
                     }
                     case 1:
                     {
                         if (didStartDriving) {
                             xpos -= 15;
-                            updateTable();
+                            
                             
                         }
+                        updateTable();
                         break;
                     }
                     case 2:
@@ -174,9 +176,10 @@ public class SunSpotHostApplication {
                         if (didStartDriving) {
                             System.out.println("driving down left");
                             ypos += 15;
-                            updateTable();
+                            
                             
                         }
+                        updateTable();
                         break;
                         
                     }
@@ -184,9 +187,10 @@ public class SunSpotHostApplication {
                     {
                         if (didStartDriving) {
                             xpos += 15;
-                            updateTable();
+                            
                             
                         }
+                        updateTable();
                         break;
                     }
                   //shouldnt happen with 3 beacons??
@@ -194,9 +198,10 @@ public class SunSpotHostApplication {
                     {
                         if (didStartDriving) {
                             ypos -= 15;
-                            updateTable();
                             
                         }
+                        updateTable();
+     
                         break;
                     }
                 }
