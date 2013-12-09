@@ -85,6 +85,42 @@ public class SunSpotHostApplication {
                     System.out.println("turnAtBeacon: " + turnAtBeacon + " DidStartDrving: "
                             + didStartDriving + " beacon addr: " + beaconAddr);
                     String hexaddr = Integer.toHexString((int) beaconAddr);
+                    //set our array and x,y, on a beacon trip
+                    if (turnAtBeacon) {
+                        //figure out which beacon did it
+                        if (hexaddr.equalsIgnoreCase(fourthBeacon)) {
+                            if (triggerArray[3]==0) {
+                                triggerArray[3] = 1;
+                                //bottom right
+                                xpos = 560;
+                                ypos = 360;
+                            }    
+                        }
+                        else if (hexaddr.equalsIgnoreCase(thirdBeacon)) {
+                            if (triggerArray[2]==0) {
+                                triggerArray[2] = 1;
+                                //bottom left
+                                xpos = 40;
+                                ypos = 360;
+                            }    
+                        }
+                        else if (hexaddr.equalsIgnoreCase(secondBeacon)) {
+                            if (triggerArray[1]==0) {
+                                triggerArray[1] = 1;
+                                //top left
+                                xpos = 40;
+                                ypos = 40;
+                            }    
+                        }
+                        else if (hexaddr.equalsIgnoreCase(firstBeacon)) {
+                            if (triggerArray[0]==0) {
+                                triggerArray[0] = 1;
+                                //top right
+                                xpos = 560;
+                                ypos = 40;
+                            }    
+                        }
+                    }
                 } catch (IOException ex) {
                    // Logger.getLogger(SunSpotHostApplication.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -101,26 +137,68 @@ public class SunSpotHostApplication {
         motionTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                //make sure we are moving before updating
-
-                if (didStartDriving) {
-                    ypos -= 10;
-                    System.out.println("y pos is: " + ypos);
-                    updateTable();
+                //figure out which hallways (delta we're in)
+                //hallway 0 is start, 1 is next,2,3...
+                int hallway = 0;
+                for (int i=triggerArray.length-1; i>-1; i--) {
+                    if (triggerArray[i]>0) {
+                        hallway = i+1;
+                    }
+                    
                 }
-                // update databse with current x,y
-                
+                //examine hallway
+                switch (hallway) {
+                    case 0:
+                    {
+                        //if we're moving
+                        if (didStartDriving) {
+                            ypos -= 5;
+                            updateTable();
+                            
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        if (didStartDriving) {
+                            xpos -= 5;
+                            updateTable();
+                            
+                        }
+                        break;
+                    }
+                    case 2:
+                    {
+                        if (didStartDriving) {
+                            ypos += 5;
+                            updateTable();
+                            
+                        }
+                        break;
+                        
+                    }
+                    case 3:
+                    {
+                        if (didStartDriving) {
+                            xpos += 5;
+                            updateTable();
+                            
+                        }
+                        break;
+                    }
+                  //shouldnt happen with 3 beacons??
+                    case 4: 
+                    {
+                        if (didStartDriving) {
+                            ypos -= 5;
+                            updateTable();
+                            
+                        }
+                        break;
+                    }
+                }
             }
         }, 2 * 1000, 2 * 1000);
-
-//            while (true) {
-//                try {
-//                        
-//
-//                } catch (Exception e) {
-//                    System.err.println("Caught " + e + " while reading sensor samples.");
-//                }
-//            }
     }
 
     /**
