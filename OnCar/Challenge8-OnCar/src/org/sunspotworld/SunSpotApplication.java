@@ -105,7 +105,6 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                     xdg.writeBoolean(didStartDriving);
                     xdg.writeLong(beaconSrcAddress);
                     txConn.send(xdg);
-                    didStartDriving = false;
                     pause(300);
                     //System.out.println("trasnsmitting" + beaconSrcAddress + turnAtBeacon + didStartDriving);
                    
@@ -238,6 +237,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener {
                 //calibrates
                 case 1:
                 {
+                    didStartDriving = false;
                    //middle light green indicates calibration
                    leds.getLED(2).setColor(green);    
                    leds.getLED(2).setOn();

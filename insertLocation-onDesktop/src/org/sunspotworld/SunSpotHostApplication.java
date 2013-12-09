@@ -47,8 +47,8 @@ public class SunSpotHostApplication {
     private boolean turnAtBeacon = false;
     private boolean isMoving = false;
     private int[] triggerArray = {0, 0, 0, 0};
-    private int xpos = 560;
-    private int ypos = 340;
+    private static int xpos = 560;
+    private static int ypos = 340;
     private static boolean didStartDriving;
     private Timer motionTimer = new Timer();
 
@@ -72,21 +72,18 @@ public class SunSpotHostApplication {
     public void recvLoop() {
         try {
             RadiogramConnection rCon = (RadiogramConnection) Connector.open("radiogram://:" + HOST_PORT);
-                    rCon.setTimeout(PACKET_INTERVAL - 5);
-                    Radiogram rdg = (Radiogram) rCon.newDatagram(rCon.getMaximumLength());
+            rCon.setTimeout(PACKET_INTERVAL - 5);
+            Radiogram rdg = (Radiogram) rCon.newDatagram(rCon.getMaximumLength());
             while (true) {
                 try {
-                    
+
                     rdg.reset();
                     rCon.receive(rdg);
-                    turnAtBeacon = rdg.readBoolean(); 
-                    if (!didStartDriving)
-                    didStartDriving = rdg.readBoolean(); 
-                    else
-                        rdg.readBoolean();
+                    turnAtBeacon = rdg.readBoolean();
+                    didStartDriving = rdg.readBoolean();
                     long beaconAddr = rdg.readLong();
-                    System.out.println("turnAtBeacon: " + turnAtBeacon + " DidStartDrving: "
-                            + didStartDriving + " beacon addr: " + beaconAddr);
+               //     System.out.println("turnAtBeacon: " + turnAtBeacon + " DidStartDrving: "
+                 //           + didStartDriving + " beacon addr: " + beaconAddr);
                     String hexaddr = Integer.toHexString((int) beaconAddr);
                 } catch (IOException ex) {
                     Logger.getLogger(SunSpotHostApplication.class.getName()).log(Level.SEVERE, null, ex);
@@ -99,32 +96,30 @@ public class SunSpotHostApplication {
     }
 
     public void updateDBLoop() {
-        while (true) {
-            createTable();
-            insertInitialDataTable();
+        createTable();
+        insertInitialDataTable();
+        motionTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                //make sure we are moving before updating
 
-            while (true) {
-                try {
-                        motionTimer.scheduleAtFixedRate(new TimerTask() {
-                            @Override
-                            public void run() {
-                                //make sure we are moving before updating
-                            
-                                    if (didStartDriving)ypos -= 2;
-                                
-                                // update databse with current x,y
-                                updateTable();
-                            }
-                        }, 2 * 1000, 2 * 1000);
-
-                    
-
-
-                } catch (Exception e) {
-                    System.err.println("Caught " + e + " while reading sensor samples.");
+                if (didStartDriving) {
+                    ypos -= 2;
+                    System.out.println("y pos is: " + ypos);
                 }
+                // update databse with current x,y
+                updateTable();
             }
-        }
+        }, 2 * 1000, 2 * 1000);
+
+//            while (true) {
+//                try {
+//                        
+//
+//                } catch (Exception e) {
+//                    System.err.println("Caught " + e + " while reading sensor samples.");
+//                }
+//            }
     }
 
     /**
@@ -178,6 +173,32 @@ public class SunSpotHostApplication {
         System.out.println("Table created successfully");
     }
 
+    public static void updateTable() {
+        try {
+            System.out.println("in update table");
+            java.sql.Connection queryConnection = null;
+            Statement queryStatement = null;
+
+            /*Create connection with database*/
+            Class.forName("org.sqlite.JDBC");
+            queryConnection = DriverManager.getConnection("jdbc:sqlite:/Users/calvinflegal/Developer/ec544/Challenge8/insertLocation-onDesktop/spotData.db");
+            //System.out.println("Opened database successfully");
+
+            /*Create sql statement*/
+            queryStatement = queryConnection.createStatement();
+            String sql = "UPDATE OURDATA SET X=" + xpos + ", Y=" + ypos
+                    + " WHERE ID='1'";
+            queryStatement.executeQuery(sql);
+
+            queryStatement.close();
+            queryConnection.close();
+
+        } catch (Exception ex) {
+            Logger.getLogger(SunSpotHostApplication.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
     /*method to insert table*/
     public static void insertInitialDataTable() {
         java.sql.Connection insertConnection = null;
@@ -206,30 +227,5 @@ public class SunSpotHostApplication {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             System.exit(0);
         }
-    }
-
-    public void updateTable() {
-        try {
-            java.sql.Connection queryConnection = null;
-            Statement queryStatement = null;
-
-            /*Create connection with database*/
-            Class.forName("org.sqlite.JDBC");
-            queryConnection = DriverManager.getConnection("jdbc:sqlite:/Users/calvinflegal/Developer/ec544/Challenge8/insertLocation-onDesktop/spotData.db");
-            //System.out.println("Opened database successfully");
-
-            /*Create sql statement*/
-            queryStatement = queryConnection.createStatement();
-            String sql = "UPDATE OURDATA SET X=" + xpos + ", Y=" + ypos
-                    + " WHERE ID='1'";
-            queryStatement.executeQuery(sql);
-
-            queryStatement.close();
-            queryConnection.close();
-
-        } catch (Exception ex) {
-            // Logger.getLogger(SunSpotHostApplication.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
     }
 }
