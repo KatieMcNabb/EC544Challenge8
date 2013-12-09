@@ -152,7 +152,7 @@ public class SunSpotHostApplication {
                     {
                         //if we're moving
                         if (didStartDriving) {
-                            ypos -= 5;
+                            ypos -= 15;
                             updateTable();
                             
                         }
@@ -161,7 +161,7 @@ public class SunSpotHostApplication {
                     case 1:
                     {
                         if (didStartDriving) {
-                            xpos -= 5;
+                            xpos -= 15;
                             updateTable();
                             
                         }
@@ -170,7 +170,7 @@ public class SunSpotHostApplication {
                     case 2:
                     {
                         if (didStartDriving) {
-                            ypos += 5;
+                            ypos += 15;
                             updateTable();
                             
                         }
@@ -180,7 +180,7 @@ public class SunSpotHostApplication {
                     case 3:
                     {
                         if (didStartDriving) {
-                            xpos += 5;
+                            xpos += 15;
                             updateTable();
                             
                         }
@@ -190,7 +190,7 @@ public class SunSpotHostApplication {
                     case 4: 
                     {
                         if (didStartDriving) {
-                            ypos -= 5;
+                            ypos -= 15;
                             updateTable();
                             
                         }

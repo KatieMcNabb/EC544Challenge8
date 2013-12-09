@@ -27,7 +27,6 @@
          //fetch it
          $.getJSON("/challenge8/coord/getCoords",function(data){
            //draw from the data
-           console.log(data);
            context.fillRect(data.x,data.y,10,10);
          });
          
