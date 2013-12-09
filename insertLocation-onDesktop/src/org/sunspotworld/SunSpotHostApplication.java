@@ -41,7 +41,7 @@ public class SunSpotHostApplication {
     private int channel = 21;
     private int power = 32;
     private String firstBeacon = "7fee";
-    private String secondBeacon;
+    private String secondBeacon = "7e57";
     private String thirdBeacon;
     private String fourthBeacon;
     private boolean turnAtBeacon = false;
@@ -82,8 +82,8 @@ public class SunSpotHostApplication {
                     turnAtBeacon = rdg.readBoolean();
                     didStartDriving = rdg.readBoolean();
                     long beaconAddr = rdg.readLong();
-                    System.out.println("turnAtBeacon: " + turnAtBeacon + " DidStartDrving: "
-                            + didStartDriving + " beacon addr: " + beaconAddr);
+//                    System.out.println("turnAtBeacon: " + turnAtBeacon + " DidStartDrving: "
+//                            + didStartDriving + " beacon addr: " + beaconAddr);
                     String hexaddr = Integer.toHexString((int) beaconAddr);
                     //set our array and x,y, on a beacon trip
                     if (turnAtBeacon) {
@@ -143,9 +143,11 @@ public class SunSpotHostApplication {
                 for (int i=triggerArray.length-1; i>-1; i--) {
                     if (triggerArray[i]>0) {
                         hallway = i+1;
+                        break;
                     }
                     
                 }
+                System.out.println("hallway is: " + hallway);
                 //examine hallway
                 switch (hallway) {
                     case 0:
@@ -170,6 +172,7 @@ public class SunSpotHostApplication {
                     case 2:
                     {
                         if (didStartDriving) {
+                            System.out.println("driving down left");
                             ypos += 15;
                             updateTable();
                             
@@ -279,7 +282,7 @@ public class SunSpotHostApplication {
             queryConnection.close();
 
         } catch (Exception ex) {
-            Logger.getLogger(SunSpotHostApplication.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(SunSpotHostApplication.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
