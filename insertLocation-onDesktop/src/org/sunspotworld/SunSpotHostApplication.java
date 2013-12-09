@@ -82,16 +82,16 @@ public class SunSpotHostApplication {
                     turnAtBeacon = rdg.readBoolean();
                     didStartDriving = rdg.readBoolean();
                     long beaconAddr = rdg.readLong();
-               //     System.out.println("turnAtBeacon: " + turnAtBeacon + " DidStartDrving: "
-                 //           + didStartDriving + " beacon addr: " + beaconAddr);
+                    System.out.println("turnAtBeacon: " + turnAtBeacon + " DidStartDrving: "
+                            + didStartDriving + " beacon addr: " + beaconAddr);
                     String hexaddr = Integer.toHexString((int) beaconAddr);
                 } catch (IOException ex) {
-                    Logger.getLogger(SunSpotHostApplication.class.getName()).log(Level.SEVERE, null, ex);
+                   // Logger.getLogger(SunSpotHostApplication.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
             }
         } catch (IOException ex) {
-            Logger.getLogger(SunSpotHostApplication.class.getName()).log(Level.SEVERE, null, ex);
+           // Logger.getLogger(SunSpotHostApplication.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -104,11 +104,12 @@ public class SunSpotHostApplication {
                 //make sure we are moving before updating
 
                 if (didStartDriving) {
-                    ypos -= 2;
+                    ypos -= 10;
                     System.out.println("y pos is: " + ypos);
+                    updateTable();
                 }
                 // update databse with current x,y
-                updateTable();
+                
             }
         }, 2 * 1000, 2 * 1000);
 
