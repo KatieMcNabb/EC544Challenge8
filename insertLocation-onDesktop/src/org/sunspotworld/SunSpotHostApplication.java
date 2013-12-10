@@ -40,15 +40,15 @@ public class SunSpotHostApplication {
     private static final short PAN_ID = IRadioPolicyManager.DEFAULT_PAN_ID;
     private int channel = 21;
     private int power = 32;
-    private String firstBeacon = "7fee";
-    private String secondBeacon = "7e57";
+    private String firstBeacon = "7e57";
+    private String secondBeacon = "7fee";
     private String thirdBeacon;
     private String fourthBeacon;
     private boolean turnAtBeacon = false;
     private boolean isMoving = false;
     private int[] triggerArray = {0, 0, 0, 0};
-    private static int xpos = 560;
-    private static int ypos = 340;
+    private static int xpos = 360;
+    private static int ypos = 560;
     private static boolean didStartDriving;
     private Timer motionTimer = new Timer();
 
@@ -92,8 +92,8 @@ public class SunSpotHostApplication {
                             if (triggerArray[3]==0) {
                                 triggerArray[3] = 1;
                                 //bottom right
-                                xpos = 560;
-                                ypos = 360;
+                                xpos = 360;
+                                ypos = 560;
                             }    
                         }
                         else if (hexaddr.equalsIgnoreCase(thirdBeacon)) {
@@ -101,7 +101,7 @@ public class SunSpotHostApplication {
                                 triggerArray[2] = 1;
                                 //bottom left
                                 xpos = 40;
-                                ypos = 360;
+                                ypos = 560;
                             }    
                         }
                         else if (hexaddr.equalsIgnoreCase(secondBeacon)) {
@@ -116,7 +116,7 @@ public class SunSpotHostApplication {
                             if (triggerArray[0]==0) {
                                 triggerArray[0] = 1;
                                 //top right
-                                xpos = 560;
+                                xpos = 360;
                                 ypos = 40;
                             }    
                         }
@@ -154,7 +154,7 @@ public class SunSpotHostApplication {
                     {
                         //if we're moving
                         if (didStartDriving) {
-                            ypos -= 15;
+                            ypos -= 30;
                             
                             
                         }
@@ -164,7 +164,7 @@ public class SunSpotHostApplication {
                     case 1:
                     {
                         if (didStartDriving) {
-                            xpos -= 15;
+                            xpos -= 45;
                             
                             
                         }
@@ -175,7 +175,7 @@ public class SunSpotHostApplication {
                     {
                         if (didStartDriving) {
                             System.out.println("driving down left");
-                            ypos += 15;
+                            ypos += 30;
                             
                             
                         }
@@ -186,7 +186,7 @@ public class SunSpotHostApplication {
                     case 3:
                     {
                         if (didStartDriving) {
-                            xpos += 15;
+                            xpos += 45;
                             
                             
                         }
@@ -273,9 +273,9 @@ public class SunSpotHostApplication {
             
             //error guard our values..
             if (xpos < 40) xpos = 40;
-            if (xpos > 560) xpos = 560;
+            if (xpos > 360) xpos = 360;
             if (ypos< 40) ypos = 40;
-            if (ypos > 360) ypos = 360;
+            if (ypos > 560) ypos = 560;
 
             /*Create sql statement*/
             queryStatement = queryConnection.createStatement();
